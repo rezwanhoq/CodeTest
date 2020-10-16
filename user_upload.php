@@ -4,7 +4,7 @@ $username = null;
 $array = [];
 $password = null;
 $createtable = null;
-$file = null;
+$filename = null;
 $host = null;
 $help = false;
 $dryrun = false;
@@ -34,7 +34,7 @@ $longopts  = array(
 $options = getopt($shortopts, $longopts);
 
 foreach ($options as $optionskey => $optionsValue) {
-    
+
     switch ($optionskey) {
         case 'u':
             $username = $optionsValue;
@@ -49,7 +49,7 @@ foreach ($options as $optionskey => $optionsValue) {
             $createtable = true;
             break;
         case 'file':
-            $file = $optionsValue;
+            $filename = $optionsValue;
             break;
         case 'dry_run':
             $dryrun = true;
@@ -58,7 +58,7 @@ foreach ($options as $optionskey => $optionsValue) {
             $help = true;
             break;
         default:
-            
+
             break;
     }
 }
@@ -69,19 +69,20 @@ if ($help) {
     }
     exit;
 }
-if ($file) {
-    $array = array_map('str_getcsv', file($file));
+
+if ($filename) {
+    $array = array_map('str_getcsv', file($filename));
     $header = array_shift($array);
     array_walk($array, '_combine_array', $header);
-
-    function _combine_array(&$row, $key, $header)
-    {
-        $row = array_combine($header, $row);
-    }
 }
 
-if ($host && $username && $password){
-    $cons = mysqli_connect("$host", "$username", "$password", "$db");    
+function _combine_array(&$row, $key, $header)
+{
+    $row = array_combine($header, $row);
+}
+
+if ($host && $username && $password) {
+    $cons = mysqli_connect("$host", "$username", "$password", "$db");
 }
 
 if ($cons && $dryrun == false) {
@@ -92,20 +93,21 @@ if ($cons && $dryrun == false) {
             $surname = ucfirst($value['surname']);
             $email = strtolower($value['email']);
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $sql = "INSERT INTO $table (name, surname, email) VALUES ('$name', '$surname', '$email')";
+                $sql = "INSERT INTO users (name, surname, email) VALUES ('$name', '$surname', '$email')";
                 if (mysqli_query($cons, $sql)) {
                     $count++;
                 }
-            } else {
-                fwrite(STDOUT, $email . PHP_EOL);
+            } else {                
+                fwrite(STDOUT, $email . " could not be inserted ". PHP_EOL);
             }
+            
         }
-        echo "Result: " . $count . " records added.";
+        echo "Result: " . $count . " records added." . PHP_EOL;
     }
 
     // create table 
     if ($createtable) {
-        echo "hello";
+
         $sql = "CREATE TABLE users(    
         name VARCHAR(30) NOT NULL,
         surname VARCHAR(30) NOT NULL,
@@ -118,6 +120,6 @@ if ($cons && $dryrun == false) {
         }
     }
     mysqli_close($cons);
-} else {    
+} else {
     die("ERROR: Could not connect to DB.");
 }
