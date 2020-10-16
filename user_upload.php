@@ -44,12 +44,39 @@ foreach ($options as $optionskey => $optionsValue) {
 }
 
 
-// $db = 'mysql';
-// $username = 'root';
-// $password = '';
-// $file = 'users.csv';
-// $table = 'usertable';
-// $host = 'localhost';
+$db = 'mysql';
+$username = 'root';
+$password = '';
+$file = 'users.csv';
+$table = 'usertable';
+$host = 'localhost';
+$count =0;
+
+$array = array_map('str_getcsv', file($file));
+$header = array_shift($array);
+array_walk($array, '_combine_array', $header);
+
+function _combine_array(&$row, $key, $header)
+{
+    $row = array_combine($header, $row);
+}
+$cons = mysqli_connect("$host", "$username", "$password", "$db");
+if (is_array($array)) {
+    foreach ($array as $key => $value) {
+        $name = ucfirst($value['name']);
+        $surname = ucfirst($value['surname']);
+        $email = strtolower($value['email']);
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $sql = "INSERT INTO $table (name, surname, email) VALUES ('$name', '$surname', '$email')";
+            if (mysqli_query($cons, $sql)) {
+                $count++;
+            }
+        } else {
+            fwrite(STDOUT, $email . PHP_EOL);           
+        }
+    }
+    echo "Result: " . $count . " records added.";
+}
 
 // $cons = mysqli_connect("$host", "$username", "$password", "$db");
 // $sql = "CREATE TABLE users(    
