@@ -3,8 +3,8 @@
 Please keep the csv file in the source directory
 
 Samples:
-  php .\user_upload.php -h localhost -u root -p 123456 --file 'users.csv'
-  php .\user_upload.php -h localhost -u root -p 123456 --create_table  
+  - php .\user_upload.php -h localhost -u root -p 123456 --file 'users.csv'
+  - php .\user_upload.php -h localhost -u root -p 123456 --create_table  
   
 Sample output for foobar.php:
 
