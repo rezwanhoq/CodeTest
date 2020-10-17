@@ -1,6 +1,6 @@
 # CodeTest
 
-Please keep the csv file in the source directory
+Please keep the csv file in the same directory
 
 Samples:
   - php .\user_upload.php -h localhost -u root -p 123456 --file 'users.csv'
